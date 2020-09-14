@@ -1,0 +1,68 @@
+const path = require('path');
+const webpack = require('webpack')
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+// const ExtractTextPlugin = require("extract-text-webpack-plugin")
+
+const extractCSS = new MiniCssExtractPlugin({
+  filename: 'site.css'
+})
+
+const bundleOutputDir = './wwwroot/dist'
+
+module.exports = {
+  mode: 'development',
+  // entry: { 
+  //   'demo': './ClientApp/demo/boot-demo.js', 
+  //   'page': './ClientApp/page/boot-page.js' 
+  // },
+  entry: {
+    vendor: ['./ClientApp/demo/boot-demo.js', './ClientApp/page/boot-page.js']
+  },
+    output: {
+      path: path.join(__dirname, bundleOutputDir),
+      filename: '[name].js',
+      publicPath: '/dist/'
+    },
+  module: {
+    rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        // options: {
+        //   extractCss: true
+        // }
+      },
+      // this will apply to both plain `.js` files
+      // AND `<script>` blocks in `.vue` files
+      {
+        test: /\.js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+            loader: 'babel-loader'
+        }
+      },
+      // this will apply to both plain `.css` files
+      // AND `<style>` blocks in `.vue` files
+      {
+        test: /\.css$/,
+        use: [
+          // 'style-loader',
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+        ]
+      },
+      { test: /\.(png|jpg|jpeg|gif|svg)$/, use: 'url-loader?limit=25000' }
+    ]
+  },
+  plugins: [
+    // make sure to include the plugin for the magic
+    new VueLoaderPlugin(),
+    extractCSS
+    // new webpack.DllReferencePlugin({
+    //   context: __dirname,
+    //   manifest: require('./wwwroot/dist/vendor-manifest.json')
+    // })
+  ]
+}
